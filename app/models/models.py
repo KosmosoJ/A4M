@@ -8,6 +8,7 @@ class Category(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String)
+    slug = Column(String, nullable=True, default=None)
 
     anime = relationship("Anime", back_populates="anime_r", lazy="joined")
 
@@ -23,6 +24,7 @@ class Anime(Base):
     ended = Column(Date)
     rating = Column(Float, default=0)
     seasons = Column(Integer)
+    slug = Column(String, nullable=True, default=None)
     category = Column(
         ForeignKey("categories.id", ondelete="SET NULL"),
         nullable=True,

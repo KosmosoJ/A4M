@@ -1,11 +1,10 @@
 from fastapi.routing import APIRouter
 from fastapi.requests import Request
-from fastapi.templating import Jinja2Templates
 from models.database import get_session
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from models.models import Anime, Category
+import utils.categories as cat_utils
+import schemas.category as cat_schemas
 
 
 router = APIRouter()
@@ -14,17 +13,19 @@ router = APIRouter()
 async def get_categories(
     request: Request, session: AsyncSession = Depends(get_session)
 ):
-    categories = await session.execute(select(Category))
-    categories = categories.scalars().all()
-    return ...
+    
+    return cat_utils.get_all_categories(session)
 
 
-@router.get("/{id}")
+@router.get("/{slug}")
 async def get_category(
-    id: int, request: Request, session: AsyncSession = Depends(get_session)
+    slug: int, request: Request, session: AsyncSession = Depends(get_session)
 ):
-    animes = await session.execute(select(Anime).where(Anime.category == id))
-    animes = animes.scalars().all()
-    category = await session.execute(select(Category).where(Category.id == id))
-    category = category.scalars().first()
+    
+    categories = cat_utils.get_category(session)
     return ...
+
+@router.post('/')
+async def create_category(category_info:cat_schemas.BaseCategory, session:AsyncSession = Depends(get_session)):
+    category = await cat_utils.create_category(category_info, session)
+    return category
