@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from routes.categories import router as categories_router
+from routes.anime import router as anime_router
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -16,6 +17,7 @@ app.add_middleware(
 )
 
 app.include_router(categories_router, prefix='/api/categories',tags=['categories'])
+app.include_router(anime_router, prefix='/api/anime', tags=['animes'])
 
 
 @app.get("/d")
