@@ -61,7 +61,7 @@ async def get_all_categories(session: AsyncSession) -> list[Category] | None:
     Returns:
         list[Category]|None:
     """
-    categories = (await session.execute(select(Category))).scalars().all()
+    categories = (await session.execute(select(Category))).unique().scalars().all()
 
     if not categories:
         return []

@@ -14,7 +14,7 @@ async def get_categories(
     request: Request, session: AsyncSession = Depends(get_session)
 ):
     
-    return cat_utils.get_all_categories(session)
+    return await cat_utils.get_all_categories(session)
 
 
 @router.get("/{slug}")
@@ -22,7 +22,7 @@ async def get_category(
     slug: int, request: Request, session: AsyncSession = Depends(get_session)
 ):
     
-    categories = cat_utils.get_category(session)
+    categories = await cat_utils.get_category(session)
     return ...
 
 @router.post('/')
