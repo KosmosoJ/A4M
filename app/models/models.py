@@ -22,6 +22,7 @@ class Anime(Base):
     type = Column(String)
     started = Column(Date)
     ended = Column(Date)
+    description = Column(String, nullable=True)
     rating = Column(Float, default=0)
     seasons = Column(Integer)
     slug = Column(String, nullable=True, default=None)
