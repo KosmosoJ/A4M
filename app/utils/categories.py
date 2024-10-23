@@ -68,23 +68,23 @@ async def get_all_categories(session: AsyncSession) -> list[Category] | None:
     return categories
 
 
-async def get_category(category_info: BaseCategory, session: AsyncSession) -> Category|None:
-    """Get a category from DB
+async def get_category(category_slug: str, session: AsyncSession) -> Category|None:
+    """Get category from DB by slug 
 
     Args:
-        category_info (BaseCategory): pydantic model
+        category_slug (str): category slug 
         session (AsyncSession)
 
     Raises:
-        HTTPException: returns http_404 if not found
+        HTTPException: if not found category with slug -> throw 404 
 
     Returns:
-        Category|None
+        Category|None: return category
     """
     category = (
         (
             await session.execute(
-                select(Category).where(Category.name == category_info.name)
+                select(Category).where(Category.slug == category_slug)
             )
         )
         .scalars()
@@ -94,7 +94,7 @@ async def get_category(category_info: BaseCategory, session: AsyncSession) -> Ca
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Category with name {category_info.name} not found",
+            detail=f"Category with slug {category_slug} not found",
         )
 
     return category

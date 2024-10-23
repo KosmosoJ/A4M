@@ -19,11 +19,10 @@ async def get_categories(
 
 @router.get("/{slug}")
 async def get_category(
-    slug: int, request: Request, session: AsyncSession = Depends(get_session)
+    slug: str, request: Request, session: AsyncSession = Depends(get_session)
 ):
-    
-    categories = await cat_utils.get_category(session)
-    return ...
+    category = await cat_utils.get_category(slug,session)
+    return category
 
 @router.post('/')
 async def create_category(category_info:cat_schemas.BaseCategory, session:AsyncSession = Depends(get_session)):
