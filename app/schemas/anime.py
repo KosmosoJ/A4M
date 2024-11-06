@@ -3,6 +3,7 @@ from datetime import date
 
 class AnimeBase(BaseModel):
     name:str = Field(default='string')
+    description:str = Field(default='some description for anime')
     russ_name:str = Field(default='string')
     type:str = Field(default='anime_type')
     started:date = Field(default='2024-12-20')
