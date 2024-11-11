@@ -1,9 +1,19 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from models.models import Anime
+from models.models import Anime, Category
 from fastapi import HTTPException, status
 from schemas.anime import AnimeBase
+from translate import Translator
+import slugify
+import random
 
+
+async def create_anime_slug(anime_title:str):
+    translator = Translator(from_lang='russian', to_lang='english')
+    trans = translator.translate(anime_title)
+    
+    slug = slugify.slugify(trans)
+    return slug
 
 async def get_all_anime(session: AsyncSession) -> list[Anime]:
     """Получение всех аниме из базы данных
@@ -95,3 +105,7 @@ async def edit_anime(anime_slug: str, anime_info: AnimeBase, session: AsyncSessi
 
     await session.commit()
     return anime
+
+async def get_anime_by_category_slug(category_slug:str, session:AsyncSession):
+    anime = (await session.execute(select(Anime).join(Category).where(Category.slug == category_slug))).unique().scalars().all()
+    return random.choice(anime)

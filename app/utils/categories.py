@@ -2,9 +2,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from models.database import get_session
 from sqlalchemy import select
 from fastapi import status, HTTPException
-from models.models import Category
+from models.models import Category, Anime
 from schemas.category import BaseCategory
-from translate import Translator
+from sqlalchemy.orm import joinedload
+from deep_translator import GoogleTranslator
 import slugify
 
 
@@ -38,7 +39,7 @@ async def create_category(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Category with name {category_info.name} already exists",
         )
-    translator = Translator(from_lang='russian', to_lang='english')
+    translator = GoogleTranslator(source='ru', target='en')
     trans = translator.translate(category_info.name)
     
     if len(trans) < 0:
@@ -61,7 +62,7 @@ async def get_all_categories(session: AsyncSession) -> list[Category] | None:
     Returns:
         list[Category]|None:
     """
-    categories = (await session.execute(select(Category))).unique().scalars().all()
+    categories = (await session.execute(select(Category).order_by(Category.name))).unique().scalars().all()
 
     if not categories:
         return []
@@ -84,7 +85,7 @@ async def get_category(category_slug: str, session: AsyncSession) -> Category|No
     category = (
         (
             await session.execute(
-                select(Category).where(Category.slug == category_slug)
+                select(Category).where(Category.slug == category_slug).options(joinedload(Category.anime))
             )
         )
         .scalars()
@@ -98,3 +99,22 @@ async def get_category(category_slug: str, session: AsyncSession) -> Category|No
         )
 
     return category
+
+
+async def get_or_create_category_id(category_name:str ,session:AsyncSession): 
+    category = (await session.execute(select(Category).where(Category.name == category_name))).scalars().first()
+    
+    if not category:
+        translator = GoogleTranslator(source='ru', target='en')
+        trans = translator.translate(category_name)
+    
+        if len(trans) < 0:
+            await session.rollback()
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=translator)
+        
+        slug = slugify.slugify(trans)
+        category = Category(name=category_name, slug=slug)
+        session.add(category)
+        await session.commit()
+        
+    return category.id

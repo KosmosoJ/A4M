@@ -9,7 +9,7 @@ class Category(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String)
     slug = Column(String, nullable=True, default=None)
-    anime = relationship("Anime", back_populates="anime_r", lazy="joined")
+    anime = relationship("Anime", back_populates="anime_r")
 
     def __repr__(self) -> str:
         return f'Category(id={self.id!r}, name={self.name!r})'
@@ -44,6 +44,8 @@ class Anime(Base):
     shiki_url = Column(String, nullable=True)
     animego_url = Column(String, nullable=True)
     anime_r = relationship('Category', back_populates='anime', lazy='joined')
+    image = relationship('Image', lazy='joined')
+    screenshost = relationship('Screenshot', lazy='joined')
     
     def to_dict(self):
         return{
