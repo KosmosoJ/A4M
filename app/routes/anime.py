@@ -20,7 +20,8 @@ async def get_all_animes(session:AsyncSession = Depends(get_session)):
 
 @router.get('/by/{category_slug}')
 async def get_anime_random_by_category_slug(category_slug:str, session:AsyncSession = Depends(get_session)):
-    return await anime_utils.get_anime_by_category_slug(category_slug, session)
+    anime = await anime_utils.get_anime_by_category_slug(category_slug, session)
+    return anime
 
 @router.get('/{anime_slug}')
 async def get_anime_by_slug(anime_slug:str, session:AsyncSession = Depends(get_session)):

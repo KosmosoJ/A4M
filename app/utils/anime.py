@@ -108,4 +108,9 @@ async def edit_anime(anime_slug: str, anime_info: AnimeBase, session: AsyncSessi
 
 async def get_anime_by_category_slug(category_slug:str, session:AsyncSession):
     anime = (await session.execute(select(Anime).join(Category).where(Category.slug == category_slug))).unique().scalars().all()
+    
+    if not anime:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Anime with category slug {category_slug} not found')
+    
     return random.choice(anime)
+    
