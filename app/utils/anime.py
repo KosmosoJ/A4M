@@ -106,11 +106,29 @@ async def edit_anime(anime_slug: str, anime_info: AnimeBase, session: AsyncSessi
     await session.commit()
     return anime
 
-async def get_anime_by_category_slug(category_slug:str, session:AsyncSession):
-    anime = (await session.execute(select(Anime).join(Category).where(Category.slug == category_slug))).unique().scalars().all()
+async def get_anime_by_category_slug(category_slug:str,only:str, session:AsyncSession):
+    if only:
+        anime = (await session.execute(select(Anime.slug).join(Category).where(Category.slug == category_slug))).unique().scalars().all()
+    else:
+        anime = (await session.execute(select(Anime).join(Category).where(Category.slug == category_slug))).unique().scalars().all()
     
     if not anime:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Anime with category slug {category_slug} not found')
     
+    return random.choice(anime)
+
+async def get_random_anime_slug(session:AsyncSession):
+    """Получение рандмного слага аниме
+
+    Args:
+        session (AsyncSession)
+
+    Returns:
+        _type_: slug:str 
+    """
+    anime = (await session.execute(select(Anime.slug))).unique().scalars().all()
+    
+    if not anime:
+        return []
     return random.choice(anime)
     

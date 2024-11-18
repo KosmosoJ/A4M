@@ -18,9 +18,13 @@ async def create_anime(anime_info:AnimeBase ,session:AsyncSession = Depends(get_
 async def get_all_animes(session:AsyncSession = Depends(get_session)):
     return await anime_utils.get_all_anime(session)
 
+@router.get('/random')
+async def get_random_anime(session:AsyncSession = Depends(get_session)):
+    return await anime_utils.get_random_anime_slug(session)
+
 @router.get('/by/{category_slug}')
-async def get_anime_random_by_category_slug(category_slug:str, session:AsyncSession = Depends(get_session)):
-    anime = await anime_utils.get_anime_by_category_slug(category_slug, session)
+async def get_anime_random_by_category_slug(category_slug:str, only:str=None, session:AsyncSession = Depends(get_session)):
+    anime = await anime_utils.get_anime_by_category_slug(category_slug,only, session)
     return anime
 
 @router.get('/{anime_slug}')
